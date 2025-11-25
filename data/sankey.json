@@ -1,0 +1,95 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+  "description": "Microsoft Revenue Flow (Sankey Diagram)",
+  "title": "Microsoft Business Segments Revenue Flow (in billions USD)",
+  "width": 800,
+  "height": 600,
+    "data": {
+      "values": [
+        {"source": "Server Products & Cloud", "target": "Intelligent Cloud", "value": 19.6},
+        {"source": "Enterprise Services", "target": "Intelligent Cloud", "value": 1.9},
+        {"source": "Office Products", "target": "Productivity", "value": 11.8},
+        {"source": "LinkedIn", "target": "Productivity", "value": 3.9},
+        {"source": "Other", "target": "Productivity", "value": 1.3},
+        {"source": "Windows", "target": "Personal Computing", "value": 4.8},
+        {"source": "Gaming", "target": "Personal Computing", "value": 4.8},
+        {"source": "Search & News Advertising", "target": "Personal Computing", "value": 3.2},
+        {"source": "Devices", "target": "Personal Computing", "value": 1.4},
+        {"source": "Intelligent Cloud", "target": "Revenue", "value": 21.5},
+        {"source": "Productivity", "target": "Revenue", "value": 17.0},
+        {"source": "Personal Computing", "target": "Revenue", "value": 14.2},
+        {"source": "Revenue", "target": "Gross Profit", "value": 35.2},
+        {"source": "Revenue", "target": "Cost of Revenue", "value": 17.5},
+        {"source": "Gross Profit", "target": "Operating Profit", "value": 20.4},
+        {"source": "Gross Profit", "target": "Operating Expenses", "value": 14.8},
+        {"source": "Cost of Revenue", "target": "Product Costs", "value": 5.7},
+        {"source": "Cost of Revenue", "target": "Service Costs", "value": 11.8},
+        {"source": "Operating Profit", "target": "Net Profit", "value": 16.4},
+        {"source": "Operating Profit", "target": "Tax", "value": 3.9},
+        {"source": "Operating Expenses", "target": "R&D", "value": 6.8},
+        {"source": "Operating Expenses", "target": "S&M", "value": 5.7},
+        {"source": "Operating Expenses", "target": "G&A", "value": 2.3}
+      ]
+  },
+  "transform": [
+    {
+      "lookup": "source",
+      "from": {
+        "data": {
+          "values": [
+            {"key": "Server Products & Cloud", "order": 0},
+            {"key": "Enterprise Services", "order": 1},
+            {"key": "Office Products", "order": 2},
+            {"key": "LinkedIn", "order": 3},
+            {"key": "Other", "order": 4},
+            {"key": "Windows", "order": 5},
+            {"key": "Gaming", "order": 6},
+            {"key": "Search & News Advertising", "order": 7},
+            {"key": "Devices", "order": 8},
+            {"key": "Intelligent Cloud", "order": 9},
+            {"key": "Productivity", "order": 10},
+            {"key": "Personal Computing", "order": 11},
+            {"key": "Revenue", "order": 12},
+            {"key": "Gross Profit", "order": 13},
+            {"key": "Cost of Revenue", "order": 14},
+            {"key": "Operating Profit", "order": 15},
+            {"key": "Operating Expenses", "order": 16}
+          ]
+        },
+        "key": "key",
+        "fields": ["order"]
+      },
+      "as": "source_order"
+    }
+  ],
+  "layer": [
+    {
+      "mark": {"type": "rule", "strokeWidth": 2, "opacity": 0.5},
+      "encoding": {
+        "x": {
+          "field": "source",
+          "type": "nominal",
+          "axis": {"title": "Flow", "labelAngle": -45}
+        },
+        "x2": {"field": "target"},
+        "strokeWidth": {
+          "field": "value",
+          "type": "quantitative",
+          "scale": {"range": [1, 20]},
+          "legend": {"title": "Flow Value (B USD)"}
+        },
+        "color": {
+          "field": "source",
+          "type": "nominal",
+          "legend": null
+        },
+        "tooltip": [
+          {"field": "source", "type": "nominal", "title": "From"},
+          {"field": "target", "type": "nominal", "title": "To"},
+          {"field": "value", "type": "quantitative", "title": "Value (B USD)", "format": ".1f"}
+        ]
+      }
+    }
+  ]
+  }
+  
