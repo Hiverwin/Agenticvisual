@@ -27,7 +27,7 @@ try:
 except Exception as e:
     print(f"[警告] 加载 benchmark.config 失败: {e}")
 
-# 支持的模型列表（不再映射到脚本，统一用 run_benchmark.py）
+# 支持的模型列
 DEFAULT_MODELS = ["gpt", "claude", "gemini", "grok", "qwen", "llama", "mistral"]
 
 
@@ -336,6 +336,11 @@ async def main():
         default="benchmark/logs/batch",
         help="运行日志目录"
     )
+    parser.add_argument(
+        "--save-views",
+        action="store_true",
+        help="保存每个问题结束时的最后一张视图图片到 output-dir/images/，并写入 result 的 final_view_path"
+    )
     
     args = parser.parse_args()
     
@@ -381,7 +386,7 @@ async def main():
             task_output_dir = output_base / f"{task_name}_{model}"
             log_path = log_base / f"{task_name}_{model}.log"
             
-            # 构造命令：调用 run_benchmark.py
+            # 构造命令：调用 run_benchmark.py（默认不保存视图以节省空间；传 --save-views 则保存最后一张视图到 result）
             cmd = [
                 sys.executable,
                 "benchmark/run_benchmark.py",
@@ -389,8 +394,9 @@ async def main():
                 "--model", model,
                 "--eval",
                 "--output-dir", str(task_output_dir),
-                "--no-save-views"  # 批量跑时节省空间
             ]
+            if not args.save_views:
+                cmd.append("--no-save-views")
             
             job = asyncio.create_task(
                 run_one(cmd, log_path, sem, args.retries)
