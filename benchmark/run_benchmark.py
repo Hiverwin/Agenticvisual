@@ -703,19 +703,22 @@ async def run_multi_turn_with_mcp(
                             except json.JSONDecodeError:
                                 tool_result = {'success': False, 'message': content_item.text}
                 
+                tool_msg = tool_result.get('message', '') or tool_result.get('error', '')
                 all_tool_calls.append({
                     'tool_name': tool_name,
                     'parameters': tool_args,
                     'result': {
                         'success': tool_result.get('success', False),
-                        'message': tool_result.get('message', '')
+                        'message': tool_msg,
+                        'error': tool_result.get('error', '')
                     }
                 })
-                
-                # Tool result message
+
+                # Tool result message (include error so model sees e.g. "No data available in spec")
                 tool_response_content = json.dumps({
                     'success': tool_result.get('success', False),
-                    'message': tool_result.get('message', ''),
+                    'message': tool_msg,
+                    'error': tool_result.get('error', ''),
                     'data': tool_result.get('cluster_statistics') or tool_result.get('correlation') or tool_result.get('summary') or {}
                 }, ensure_ascii=False)
                 
@@ -864,7 +867,10 @@ async def run_task_async(
     chart_id = task.get("chart_id", task_id)
     vega_spec_path = task.get("vega_spec_path")
     vega_spec = load_vega_spec(chart_id, task_dir, vega_spec_path=vega_spec_path)
-    
+    # Unwrap if task spec is wrapped as { "spec": { ... } } so MCP tools get standard Vega-Lite
+    if isinstance(vega_spec.get("spec"), dict):
+        vega_spec = vega_spec["spec"]
+
     # Output directory
     if output_dir:
         out_path = Path(output_dir)

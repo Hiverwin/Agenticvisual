@@ -483,7 +483,9 @@ def _infer_field_type(vega_spec: Dict, field_name: str) -> str:
 
 
 def _get_spec_data(vega_spec: Dict) -> List[Dict]:
-    """获取 spec 中的数据（兼容 Vega-Lite 和 Vega）"""
+    """获取 spec 中的数据 兼容 Vega-Lite 和 Vega支持顶层 "spec" 包装。"""
+    if isinstance(vega_spec.get("spec"), dict):
+        vega_spec = vega_spec["spec"]
     # Vega-Lite 格式: data.values
     data_obj = vega_spec.get('data', {})
     if isinstance(data_obj, dict) and 'values' in data_obj:
